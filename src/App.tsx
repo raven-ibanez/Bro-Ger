@@ -1,91 +1,146 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useCart } from './hooks/useCart';
+import React, { useState } from 'react';
 import Header from './components/Header';
-import SubNav from './components/SubNav';
+import Hero from './components/Hero';
 import Menu from './components/Menu';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
-import FloatingCartButton from './components/FloatingCartButton';
 import AdminDashboard from './components/AdminDashboard';
+import Sidebar from './components/Sidebar';
+import FloatingCartButton from './components/FloatingCartButton';
+import { useCart } from './hooks/useCart';
 import { useMenu } from './hooks/useMenu';
 
-function MainApp() {
-  const cart = useCart();
-  const { menuItems } = useMenu();
-  const [currentView, setCurrentView] = React.useState<'menu' | 'cart' | 'checkout'>('menu');
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
+const App: React.FC = () => {
+  const [currentView, setCurrentView] = useState<'home' | 'menu' | 'cart' | 'checkout' | 'admin'>('home');
+  const [selectedCategory, setSelectedCategory] = useState('home');
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  
+  const {
+    cartItems,
+    isCartOpen,
+    addToCart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    getTotalPrice,
+    getTotalItems,
+    openCart,
+    closeCart
+  } = useCart();
 
-  const handleViewChange = (view: 'menu' | 'cart' | 'checkout') => {
-    setCurrentView(view);
+  const { menuItems, loading } = useMenu();
+
+  const handleMenuClick = () => {
+    setCurrentView('menu');
+    setShowMobileMenu(false);
   };
 
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
+  const handleCartClick = () => {
+    setCurrentView('cart');
+    setShowMobileMenu(false);
   };
 
-  // Filter menu items based on selected category
-  const filteredMenuItems = selectedCategory === 'all' 
-    ? menuItems 
-    : menuItems.filter(item => item.category === selectedCategory);
+  const handleBackToMenu = () => {
+    setCurrentView('menu');
+  };
+
+  const handleBackToCart = () => {
+    setCurrentView('cart');
+  };
+
+  const handleCheckout = () => {
+    setCurrentView('checkout');
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView('home');
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    if (category === 'home') {
+      setCurrentView('home');
+    } else {
+      setCurrentView('menu');
+    }
+  };
+
+  // Check if we're on admin route
+  const isAdminRoute = window.location.pathname === '/admin';
+
+  if (isAdminRoute) {
+    return <AdminDashboard />;
+  }
 
   return (
-    <div className="min-h-screen bg-cream-50 font-inter">
-      <Header 
-        cartItemsCount={cart.getTotalItems()}
-        onCartClick={() => handleViewChange('cart')}
-        onMenuClick={() => handleViewChange('menu')}
-      />
-      <SubNav selectedCategory={selectedCategory} onCategoryClick={handleCategoryClick} />
-      
-      {currentView === 'menu' && (
-        <Menu 
-          menuItems={filteredMenuItems}
-          addToCart={cart.addToCart}
-          cartItems={cart.cartItems}
-          updateQuantity={cart.updateQuantity}
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row p-2 lg:p-4">
+      {/* Sidebar */}
+      <div className="lg:w-80 w-full lg:block">
+        <Sidebar 
+          selectedCategory={selectedCategory}
+          onCategorySelect={handleCategorySelect}
         />
-      )}
+      </div>
       
-      {currentView === 'cart' && (
-        <Cart 
-          cartItems={cart.cartItems}
-          updateQuantity={cart.updateQuantity}
-          removeFromCart={cart.removeFromCart}
-          clearCart={cart.clearCart}
-          getTotalPrice={cart.getTotalPrice}
-          onContinueShopping={() => handleViewChange('menu')}
-          onCheckout={() => handleViewChange('checkout')}
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col lg:ml-4">
+        <Header
+          cartItemsCount={getTotalItems()}
+          onCartClick={handleCartClick}
         />
-      )}
-      
-      {currentView === 'checkout' && (
-        <Checkout 
-          cartItems={cart.cartItems}
-          totalPrice={cart.getTotalPrice()}
-          onBack={() => handleViewChange('cart')}
+
+        {currentView === 'home' && (
+          <>
+            <Hero />
+            <Menu
+              menuItems={menuItems}
+              addToCart={addToCart}
+              cartItems={cartItems}
+              updateQuantity={updateQuantity}
+              selectedCategory={selectedCategory}
+              onCategorySelect={handleCategorySelect}
+            />
+          </>
+        )}
+
+        {currentView === 'menu' && (
+          <Menu
+            menuItems={menuItems}
+            addToCart={addToCart}
+            cartItems={cartItems}
+            updateQuantity={updateQuantity}
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+          />
+        )}
+
+        {currentView === 'cart' && (
+          <Cart
+            cartItems={cartItems}
+            updateQuantity={updateQuantity}
+            removeFromCart={removeFromCart}
+            clearCart={clearCart}
+            getTotalPrice={getTotalPrice}
+            onContinueShopping={handleBackToMenu}
+            onCheckout={handleCheckout}
+          />
+        )}
+
+        {currentView === 'checkout' && (
+          <Checkout
+            cartItems={cartItems}
+            totalPrice={getTotalPrice()}
+            onBack={handleBackToCart}
+          />
+        )}
+
+        <FloatingCartButton
+          itemCount={getTotalItems()}
+          onClick={handleCartClick}
         />
-      )}
-      
-      {currentView === 'menu' && (
-        <FloatingCartButton 
-          itemCount={cart.getTotalItems()}
-          onCartClick={() => handleViewChange('cart')}
-        />
-      )}
+      </div>
     </div>
   );
-}
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<MainApp />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-      </Routes>
-    </Router>
-  );
-}
+};
 
 export default App;

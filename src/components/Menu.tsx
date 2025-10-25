@@ -2,135 +2,334 @@ import React from 'react';
 import { MenuItem, CartItem } from '../types';
 import { useCategories } from '../hooks/useCategories';
 import MenuItemCard from './MenuItemCard';
-import MobileNav from './MobileNav';
-
-// Preload images for better performance
-const preloadImages = (items: MenuItem[]) => {
-  items.forEach(item => {
-    if (item.image) {
-      const img = new Image();
-      img.src = item.image;
-    }
-  });
-};
+import { Search, Plus, Trash2 } from 'lucide-react';
 
 interface MenuProps {
   menuItems: MenuItem[];
   addToCart: (item: MenuItem, quantity?: number, variation?: any, addOns?: any[]) => void;
   cartItems: CartItem[];
   updateQuantity: (id: string, quantity: number) => void;
+  selectedCategory?: string;
+  onCategorySelect?: (category: string) => void;
 }
 
-const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuantity }) => {
+const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuantity, selectedCategory = 'grilledburger', onCategorySelect }) => {
   const { categories } = useCategories();
-  const [activeCategory, setActiveCategory] = React.useState('hot-coffee');
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [showQuantityModal, setShowQuantityModal] = React.useState(false);
+  const [selectedItem, setSelectedItem] = React.useState<MenuItem | null>(null);
+  const [quantity, setQuantity] = React.useState(1);
 
-  // Preload images when menu items change
-  React.useEffect(() => {
-    if (menuItems.length > 0) {
-      // Preload images for visible category first
-      const visibleItems = menuItems.filter(item => item.category === activeCategory);
-      preloadImages(visibleItems);
-      
-      // Then preload other images after a short delay
-      setTimeout(() => {
-        const otherItems = menuItems.filter(item => item.category !== activeCategory);
-        preloadImages(otherItems);
-      }, 1000);
+  // Filter menu items based on selected category and search query
+  const filteredItems = React.useMemo(() => {
+    let items = selectedCategory === 'home' 
+      ? menuItems 
+      : menuItems.filter(item => item.category === selectedCategory);
+
+    if (searchQuery.trim()) {
+      items = items.filter(item => 
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-  }, [menuItems, activeCategory]);
 
-  const handleCategoryClick = (categoryId: string) => {
-    setActiveCategory(categoryId);
-    const element = document.getElementById(categoryId);
-    if (element) {
-      const headerHeight = 64; // Header height
-      const mobileNavHeight = 60; // Mobile nav height
-      const offset = headerHeight + mobileNavHeight + 20; // Extra padding
-      const elementPosition = element.offsetTop - offset;
-      
-      window.scrollTo({
-        top: elementPosition,
-        behavior: 'smooth'
-      });
+    return items;
+  }, [menuItems, selectedCategory, searchQuery]);
+
+  const getCartQuantity = (item: MenuItem) => {
+    const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
+    return cartItem?.quantity || 0;
+  };
+
+  const handleAddToCart = (item: MenuItem) => {
+    setSelectedItem(item);
+    setQuantity(1);
+    setShowQuantityModal(true);
+  };
+
+  const handleConfirmAddToCart = () => {
+    if (selectedItem) {
+      addToCart(selectedItem, quantity);
+      setShowQuantityModal(false);
+      setSelectedItem(null);
+      setQuantity(1);
     }
   };
 
-  React.useEffect(() => {
-    if (categories.length > 0) {
-      // Set default to dim-sum if it exists, otherwise first category
-      const defaultCategory = categories.find(cat => cat.id === 'dim-sum') || categories[0];
-      if (!categories.find(cat => cat.id === activeCategory)) {
-        setActiveCategory(defaultCategory.id);
-      }
+  const handleCloseModal = () => {
+    setShowQuantityModal(false);
+    setSelectedItem(null);
+    setQuantity(1);
+  };
+
+  const handleUpdateQuantity = (item: MenuItem, quantity: number) => {
+    const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
+    if (cartItem) {
+      updateQuantity(cartItem.id, quantity);
     }
-  }, [categories, activeCategory]);
+  };
 
+  const handleRemoveFromCart = (item: MenuItem) => {
+    const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
+    if (cartItem) {
+      updateQuantity(cartItem.id, 0);
+    }
+  };
+
+  // Close search when clicking outside
   React.useEffect(() => {
-    const handleScroll = () => {
-      const sections = categories.map(cat => document.getElementById(cat.id)).filter(Boolean);
-      const scrollPosition = window.scrollY + 200;
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveCategory(categories[i].id);
-          break;
-        }
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (isSearching && !target.closest('.search-container')) {
+        setIsSearching(false);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+    if (isSearching) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isSearching]);
 
   return (
-    <>
-      <MobileNav 
-        activeCategory={activeCategory}
-        onCategoryClick={handleCategoryClick}
-      />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-noto font-semibold text-black mb-4">Our Menu</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Discover our selection of authentic dim sum, flavorful noodles, and traditional Asian dishes, 
-          all prepared with fresh ingredients and authentic techniques.
-        </p>
+    <div className="flex-1 bg-white">
+      {/* Category Navigation Bar */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="relative search-container">
+              <Search 
+                className="h-5 w-5 text-gray-600 cursor-pointer hover:text-black transition-colors" 
+                onClick={() => setIsSearching(!isSearching)}
+              />
+              {isSearching && (
+                <div className="absolute top-8 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-64">
+                  <input
+                    type="text"
+                    placeholder="Search menu items..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    autoFocus
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => onCategorySelect('home')}
+                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'home' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                HOME
+              </button>
+              <button 
+                onClick={() => onCategorySelect('grilledburger')}
+                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'grilledburger' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                GRILLEDBURGER
+              </button>
+              <button 
+                onClick={() => onCategorySelect('chickensandwich')}
+                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'chickensandwich' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                CHICKENSANDWICH
+              </button>
+              <button 
+                onClick={() => onCategorySelect('pickapicka')}
+                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'pickapicka' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                PICKA-PICKA
+              </button>
+              <button 
+                onClick={() => onCategorySelect('drinks')}
+                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'drinks' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                DRINKS
+              </button>
+              <button 
+                onClick={() => onCategorySelect('addons')}
+                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'addons' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                ADD ONS
+              </button>
+            </div>
+          </div>
+          
+        </div>
       </div>
 
-      {categories.map((category) => {
-        const categoryItems = menuItems.filter(item => item.category === category.id);
+      {/* Menu Content */}
+      <div className="p-4 lg:p-6 lg:pr-8">
+        {searchQuery && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-black mb-2">
+              Search Results for "{searchQuery}"
+            </h2>
+            <p className="text-sm text-gray-600">
+              Found {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+        )}
         
-        if (categoryItems.length === 0) return null;
-        
-        return (
-          <section key={category.id} id={category.id} className="mb-16">
-            <div className="flex items-center mb-8">
-              <span className="text-3xl mr-3">{category.icon}</span>
-              <h3 className="text-3xl font-noto font-medium text-black">{category.name}</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categoryItems.map((item) => {
-                const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
-                return (
-                  <MenuItemCard
-                    key={item.id}
-                    item={item}
-                    onAddToCart={addToCart}
-                    quantity={cartItem?.quantity || 0}
-                    onUpdateQuantity={updateQuantity}
+        {!searchQuery && selectedCategory !== 'home' && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-black mb-2">
+              {selectedCategory.toUpperCase()}
+            </h2>
+            <a href="#" className="text-sm text-gray-600 hover:text-black">
+              View everything ({filteredItems.length})
+            </a>
+          </div>
+        )}
+
+        {/* Product Grid */}
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
+            <p className="text-gray-500">
+              {searchQuery ? `No menu items match "${searchQuery}"` : 'No items available in this category'}
+            </p>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="mt-4 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
+              >
+                Clear Search
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
+            {filteredItems.map((item) => {
+            const quantity = getCartQuantity(item);
+            return (
+              <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 lg:p-8 flex items-center">
+                {/* Product Image - Left Side */}
+                <div className="w-20 h-20 lg:w-32 lg:h-32 bg-gray-50 rounded-lg flex items-center justify-center mr-4 lg:mr-8 flex-shrink-0">
+                  {item.image ? (
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-gray-400 text-5xl">🍔</div>
+                  )}
+                </div>
+                
+                {/* Product Info - Right Side */}
+                <div className="flex-1">
+                  <h3 className="font-medium text-black text-lg lg:text-2xl mb-2 lg:mb-3">{item.name}</h3>
+                  <div className="text-lg lg:text-2xl font-bold text-black">
+                    ₱{item.basePrice.toFixed(2)}
+                  </div>
+                </div>
+                
+                {/* Quantity Controls - Bottom Right */}
+                <div className="flex items-center">
+                  {quantity > 0 ? (
+                    <div className="flex items-center space-x-3 lg:space-x-5">
+                      <button 
+                        onClick={() => handleRemoveFromCart(item)}
+                        className="p-1 lg:p-2 text-gray-600 hover:text-red-600"
+                      >
+                        <Trash2 className="h-5 w-5 lg:h-8 lg:w-8" />
+                      </button>
+                      <span className="text-lg lg:text-2xl font-medium text-black underline">{quantity}</span>
+                      <button 
+                        onClick={() => handleUpdateQuantity(item, quantity + 1)}
+                        className="p-1 lg:p-2 text-gray-600 hover:text-black"
+                      >
+                        <Plus className="h-5 w-5 lg:h-8 lg:w-8" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => handleAddToCart(item)}
+                      className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          </div>
+        )}
+      </div>
+
+      {/* Quantity Selection Modal */}
+      {showQuantityModal && selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center mr-4">
+                {selectedItem.image ? (
+                  <img 
+                    src={selectedItem.image} 
+                    alt={selectedItem.name}
+                    className="w-full h-full object-contain"
                   />
-                );
-              })}
+                ) : (
+                  <div className="text-gray-400 text-2xl">🍔</div>
+                )}
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">{selectedItem.name}</h3>
+                <p className="text-gray-600">₱{selectedItem.basePrice.toFixed(2)}</p>
+              </div>
             </div>
-          </section>
-        );
-      })}
-      </main>
-    </>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Quantity
+              </label>
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                >
+                  <span className="text-lg">-</span>
+                </button>
+                <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                >
+                  <span className="text-lg">+</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={handleCloseModal}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAddToCart}
+                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
