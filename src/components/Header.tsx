@@ -19,12 +19,21 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onSearchCl
     }
   };
 
+  const handleLogoClick = () => {
+    window.location.reload();
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Title */}
-          <h1 className="text-2xl font-bold text-black">BRO-GER MAIN</h1>
+          <h1 
+            className="text-2xl font-bold text-black cursor-pointer hover:opacity-70 transition-opacity" 
+            onClick={handleLogoClick}
+          >
+            BRO-GER 
+          </h1>
           
           {/* Right side - Search and Cart */}
           <div className="flex items-center space-x-4">

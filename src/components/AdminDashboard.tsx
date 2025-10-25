@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Save, X, ArrowLeft, Coffee, TrendingUp, Package, Users, Lock, FolderOpen, CreditCard, Settings } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, ArrowLeft, Coffee, TrendingUp, Package, Users, Lock, FolderOpen, CreditCard, Settings, Sidebar, MessageSquare } from 'lucide-react';
 import { MenuItem, Variation, AddOn } from '../types';
 import { addOnCategories } from '../data/menuData';
 import { useMenu } from '../hooks/useMenu';
-import { useCategories, Category } from '../hooks/useCategories';
+import { useCategories } from '../hooks/useCategories';
 import ImageUpload from './ImageUpload';
 import CategoryManager from './CategoryManager';
 import PaymentMethodManager from './PaymentMethodManager';
 import SiteSettingsManager from './SiteSettingsManager';
+import SidebarContentManager from './SidebarContentManager';
+import ReviewManager from './ReviewManager';
 
 const AdminDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -17,7 +19,7 @@ const AdminDashboard: React.FC = () => {
   const [loginError, setLoginError] = useState('');
   const { menuItems, loading, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu();
   const { categories } = useCategories();
-  const [currentView, setCurrentView] = useState<'dashboard' | 'items' | 'add' | 'edit' | 'categories' | 'payments' | 'settings'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'items' | 'add' | 'edit' | 'categories' | 'payments' | 'settings' | 'sidebar' | 'reviews'>('dashboard');
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -926,6 +928,16 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
+  // Sidebar Content View
+  if (currentView === 'sidebar') {
+    return <SidebarContentManager onBack={() => setCurrentView('dashboard')} />;
+  }
+
+  // Reviews View
+  if (currentView === 'reviews') {
+    return <ReviewManager onBack={() => setCurrentView('dashboard')} />;
+  }
+
   // Dashboard View
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1045,6 +1057,20 @@ const AdminDashboard: React.FC = () => {
               >
                 <Settings className="h-5 w-5 text-gray-400" />
                 <span className="font-medium text-gray-900">Site Settings</span>
+              </button>
+              <button
+                onClick={() => setCurrentView('sidebar')}
+                className="w-full flex items-center space-x-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors duration-200"
+              >
+                <Sidebar className="h-5 w-5 text-gray-400" />
+                <span className="font-medium text-gray-900">Sidebar Content</span>
+              </button>
+              <button
+                onClick={() => setCurrentView('reviews')}
+                className="w-full flex items-center space-x-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors duration-200"
+              >
+                <MessageSquare className="h-5 w-5 text-gray-400" />
+                <span className="font-medium text-gray-900">Customer Reviews</span>
               </button>
             </div>
           </div>

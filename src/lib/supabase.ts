@@ -198,6 +198,44 @@ export type Database = {
           updated_at?: string;
         };
       };
+      reviews: {
+        Row: {
+          id: string;
+          customer_name: string;
+          customer_email: string | null;
+          rating: number;
+          title: string;
+          content: string;
+          approved: boolean;
+          featured: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_name: string;
+          customer_email?: string | null;
+          rating: number;
+          title: string;
+          content: string;
+          approved?: boolean;
+          featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          customer_name?: string;
+          customer_email?: string | null;
+          rating?: number;
+          title?: string;
+          content?: string;
+          approved?: boolean;
+          featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 };

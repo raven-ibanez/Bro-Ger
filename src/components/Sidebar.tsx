@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MessageCircle, Facebook, ChevronDown } from 'lucide-react';
+import { useSidebarContent } from '../hooks/useSidebarContent';
 
 interface SidebarProps {
   selectedCategory: string;
@@ -9,14 +10,14 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect }) => {
   const [expandedDelivery, setExpandedDelivery] = useState(false);
   const [expandedPickup, setExpandedPickup] = useState(false);
+  const { content, loading } = useSidebarContent();
   
   const categories = [
-    { id: 'home', name: 'HOME' },
-    { id: 'grilledburger', name: 'GRILLEDBURGER' },
-    { id: 'chickensandwich', name: 'CHICKENSANDWICH' },
-    { id: 'pickapicka', name: 'PICKA-PICKA' },
-    { id: 'drinks', name: 'DRINKS' },
-    { id: 'addons', name: 'ADD ONS' }
+    { id: 'grilledburger', name: 'GRILLEDBURGER', icon: '🍔' },
+    { id: 'chickensandwich', name: 'CHICKENSANDWICH', icon: '🐔' },
+    { id: 'pickapicka', name: 'PICKA-PICKA', icon: '🍗' },
+    { id: 'drinks', name: 'DRINKS', icon: '🥤' },
+    { id: 'addons', name: 'ADD ONS', icon: '➕' }
   ];
 
   return (
@@ -25,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h3 className="font-semibold text-black text-lg mb-3">ABOUT US</h3>
         <p className="text-gray-600 text-sm">
-          You can also Contact us on our page for faster transaction @Bro-Ger FB page
+          {loading ? 'Loading...' : content.aboutUs}
         </p>
       </div>
 
@@ -33,18 +34,24 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h3 className="font-semibold text-black text-lg mb-3">GET IN TOUCH</h3>
         <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <MessageCircle className="h-4 w-4 text-green-600" />
-            <span className="text-sm text-gray-600">+63</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Mail className="h-4 w-4 text-blue-600" />
-            <span className="text-sm text-gray-600">brogerphilippines@gmail.com</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Phone className="h-4 w-4 text-gray-600" />
-            <span className="text-sm text-gray-600">+639171102916</span>
-          </div>
+          {content.contactMessage && (
+            <div className="flex items-center space-x-2">
+              <MessageCircle className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-gray-600">{loading ? 'Loading...' : content.contactMessage}</span>
+            </div>
+          )}
+          {content.contactEmail && (
+            <div className="flex items-center space-x-2">
+              <Mail className="h-4 w-4 text-blue-600" />
+              <span className="text-sm text-gray-600">{loading ? 'Loading...' : content.contactEmail}</span>
+            </div>
+          )}
+          {content.contactPhone && (
+            <div className="flex items-center space-x-2">
+              <Phone className="h-4 w-4 text-gray-600" />
+              <span className="text-sm text-gray-600">{loading ? 'Loading...' : content.contactPhone}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -63,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
           </button>
           {expandedDelivery && (
             <div className="mt-2 ml-4 text-xs text-gray-600">
-              Within bagong barrio
+              {loading ? 'Loading...' : content.deliveryInfo}
             </div>
           )}
         </div>
@@ -82,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
           </button>
           {expandedPickup && (
             <div className="mt-2 ml-4 text-xs text-gray-600">
-              Pickup time: WE WILL CONTACT YOU ONCE YOUR ORDER IS DONE
+              {loading ? 'Loading...' : content.pickupInfo}
             </div>
           )}
         </div>
@@ -102,7 +109,10 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
                   : 'text-gray-600 hover:text-black'
               }`}
             >
-              {category.name}
+              <span className="inline-flex items-center space-x-2">
+                <span>{category.icon}</span>
+                <span>{category.name}</span>
+              </span>
             </button>
           ))}
         </div>

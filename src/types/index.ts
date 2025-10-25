@@ -75,3 +75,25 @@ export interface SiteSettings {
   currency: string;
   currency_code: string;
 }
+
+// Review Types
+export interface Review {
+  id: string;
+  customer_name: string;
+  customer_email?: string;
+  rating: number;
+  title: string;
+  content: string;
+  approved: boolean;
+  featured: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewFormData {
+  customer_name: string;
+  customer_email?: string;
+  rating: number;
+  title: string;
+  content: string;
+}

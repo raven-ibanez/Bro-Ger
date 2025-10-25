@@ -10,7 +10,6 @@ const MobileNav: React.FC<MobileNavProps> = ({ activeCategory, onCategoryClick }
     onCategoryClick(categoryId);
   };
   const categories = [
-    { id: 'home', name: 'HOME', icon: '🏠' },
     { id: 'grilledburger', name: 'GRILLEDBURGER', icon: '🍔' },
     { id: 'chickensandwich', name: 'CHICKENSANDWICH', icon: '🐔' },
     { id: 'pickapicka', name: 'PICKA-PICKA', icon: '🍗' },
