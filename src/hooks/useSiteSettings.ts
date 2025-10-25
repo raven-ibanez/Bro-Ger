@@ -25,7 +25,8 @@ export const useSiteSettings = () => {
         site_logo: data.find(s => s.id === 'site_logo')?.value || '',
         site_description: data.find(s => s.id === 'site_description')?.value || '',
         currency: data.find(s => s.id === 'currency')?.value || 'PHP',
-        currency_code: data.find(s => s.id === 'currency_code')?.value || 'PHP'
+        currency_code: data.find(s => s.id === 'currency_code')?.value || 'PHP',
+        hero_image: data.find(s => s.id === 'hero_image')?.value || 'https://amyfewmjpfplarkrevut.supabase.co/storage/v1/object/public/menu-images/1761372138519-5ciub5jsntb.jpg'
       };
 
       setSiteSettings(settings);

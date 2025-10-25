@@ -25,7 +25,7 @@ const Cart: React.FC<CartProps> = ({
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">☕</div>
+          <div className="text-6xl mb-4">🍔</div>
           <h2 className="text-2xl font-playfair font-medium text-black mb-2">Your cart is empty</h2>
           <p className="text-gray-600 mb-6">Add some delicious items to get started!</p>
           <button

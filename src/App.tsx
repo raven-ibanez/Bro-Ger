@@ -107,25 +107,25 @@ const App: React.FC = () => {
       
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:ml-4">
-        <Header
-          cartItemsCount={getTotalItems()}
-          onCartClick={handleCartClick}
-        />
-
-        {/* Mobile Navigation */}
-        <MobileNav
-          activeCategory={selectedCategory}
-          onCategoryClick={handleCategorySelect}
-        />
-
         {currentView === 'home' && (
           <>
+            <Header
+              cartItemsCount={getTotalItems()}
+              onCartClick={handleCartClick}
+            />
+            
             <Hero />
             
             {/* Mobile Sidebar Content - Same as Desktop */}
             <MobileSidebarContent 
               selectedCategory={selectedCategory}
               onCategorySelect={handleCategorySelect}
+            />
+            
+            {/* Mobile Navigation */}
+            <MobileNav
+              activeCategory={selectedCategory}
+              onCategoryClick={handleCategorySelect}
             />
             
             <Menu
@@ -143,34 +143,52 @@ const App: React.FC = () => {
         )}
 
         {currentView === 'menu' && (
-          <Menu
-            menuItems={menuItems}
-            addToCart={addToCart}
-            cartItems={cartItems}
-            updateQuantity={updateQuantity}
-            selectedCategory={selectedCategory}
-            onCategorySelect={handleCategorySelect}
-          />
+          <>
+            <Header
+              cartItemsCount={getTotalItems()}
+              onCartClick={handleCartClick}
+            />
+            <Menu
+              menuItems={menuItems}
+              addToCart={addToCart}
+              cartItems={cartItems}
+              updateQuantity={updateQuantity}
+              selectedCategory={selectedCategory}
+              onCategorySelect={handleCategorySelect}
+            />
+          </>
         )}
 
         {currentView === 'cart' && (
-          <Cart
-            cartItems={cartItems}
-            updateQuantity={updateQuantity}
-            removeFromCart={removeFromCart}
-            clearCart={clearCart}
-            getTotalPrice={getTotalPrice}
-            onContinueShopping={handleBackToMenu}
-            onCheckout={handleCheckout}
-          />
+          <>
+            <Header
+              cartItemsCount={getTotalItems()}
+              onCartClick={handleCartClick}
+            />
+            <Cart
+              cartItems={cartItems}
+              updateQuantity={updateQuantity}
+              removeFromCart={removeFromCart}
+              clearCart={clearCart}
+              getTotalPrice={getTotalPrice}
+              onContinueShopping={handleBackToMenu}
+              onCheckout={handleCheckout}
+            />
+          </>
         )}
 
         {currentView === 'checkout' && (
-          <Checkout
-            cartItems={cartItems}
-            totalPrice={getTotalPrice()}
-            onBack={handleBackToCart}
-          />
+          <>
+            <Header
+              cartItemsCount={getTotalItems()}
+              onCartClick={handleCartClick}
+            />
+            <Checkout
+              cartItems={cartItems}
+              totalPrice={getTotalPrice()}
+              onBack={handleBackToCart}
+            />
+          </>
         )}
 
         <FloatingCartButton

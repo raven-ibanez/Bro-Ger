@@ -15,6 +15,8 @@ const SiteSettingsManager: React.FC = () => {
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
+  const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
+  const [heroImagePreview, setHeroImagePreview] = useState<string>('');
 
   React.useEffect(() => {
     if (siteSettings) {
@@ -25,6 +27,7 @@ const SiteSettingsManager: React.FC = () => {
         currency_code: siteSettings.currency_code
       });
       setLogoPreview(siteSettings.site_logo);
+      setHeroImagePreview(siteSettings.hero_image);
     }
   }, [siteSettings]);
 
@@ -48,14 +51,33 @@ const SiteSettingsManager: React.FC = () => {
     }
   };
 
+  const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setHeroImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setHeroImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = async () => {
     try {
       let logoUrl = logoPreview;
+      let heroImageUrl = heroImagePreview;
       
       // Upload new logo if selected
       if (logoFile) {
         const uploadedUrl = await uploadImage(logoFile, 'site-logo');
         logoUrl = uploadedUrl;
+      }
+
+      // Upload new hero image if selected
+      if (heroImageFile) {
+        const uploadedUrl = await uploadImage(heroImageFile, 'hero-image');
+        heroImageUrl = uploadedUrl;
       }
 
       // Update all settings
@@ -64,11 +86,13 @@ const SiteSettingsManager: React.FC = () => {
         site_description: formData.site_description,
         currency: formData.currency,
         currency_code: formData.currency_code,
-        site_logo: logoUrl
+        site_logo: logoUrl,
+        hero_image: heroImageUrl
       });
 
       setIsEditing(false);
       setLogoFile(null);
+      setHeroImageFile(null);
     } catch (error) {
       console.error('Error saving site settings:', error);
     }
@@ -83,9 +107,11 @@ const SiteSettingsManager: React.FC = () => {
         currency_code: siteSettings.currency_code
       });
       setLogoPreview(siteSettings.site_logo);
+      setHeroImagePreview(siteSettings.hero_image);
     }
     setIsEditing(false);
     setLogoFile(null);
+    setHeroImageFile(null);
   };
 
   if (loading) {
@@ -169,6 +195,44 @@ const SiteSettingsManager: React.FC = () => {
                 >
                   <Upload className="h-4 w-4" />
                   <span>Upload Logo</span>
+                </label>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Hero Image */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Hero Image
+          </label>
+          <div className="flex items-center space-x-4">
+            <div className="w-32 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+              {heroImagePreview ? (
+                <img
+                  src={heroImagePreview}
+                  alt="Hero Image"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-2xl text-gray-400">🍔</div>
+              )}
+            </div>
+            {isEditing && (
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleHeroImageChange}
+                  className="hidden"
+                  id="hero-upload"
+                />
+                <label
+                  htmlFor="hero-upload"
+                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center space-x-2 cursor-pointer"
+                >
+                  <Upload className="h-4 w-4" />
+                  <span>Upload Hero Image</span>
                 </label>
               </div>
             )}

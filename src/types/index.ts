@@ -74,6 +74,7 @@ export interface SiteSettings {
   site_description: string;
   currency: string;
   currency_code: string;
+  hero_image: string;
 }
 
 // Review Types
