@@ -6,6 +6,7 @@ import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import AdminDashboard from './components/AdminDashboard';
 import Sidebar from './components/Sidebar';
+import MobileNav from './components/MobileNav';
 import FloatingCartButton from './components/FloatingCartButton';
 import { useCart } from './hooks/useCart';
 import { useMenu } from './hooks/useMenu';
@@ -75,7 +76,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row p-2 lg:p-4">
       {/* Sidebar */}
-      <div className="lg:w-80 w-full lg:block">
+      <div className="hidden lg:block lg:w-80">
         <Sidebar 
           selectedCategory={selectedCategory}
           onCategorySelect={handleCategorySelect}
@@ -87,6 +88,12 @@ const App: React.FC = () => {
         <Header
           cartItemsCount={getTotalItems()}
           onCartClick={handleCartClick}
+        />
+
+        {/* Mobile Navigation */}
+        <MobileNav
+          activeCategory={selectedCategory}
+          onCategoryClick={handleCategorySelect}
         />
 
         {currentView === 'home' && (

@@ -94,78 +94,78 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
 
   return (
     <div className="flex-1 bg-white">
-      {/* Category Navigation Bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="relative search-container">
-              <Search 
-                className="h-5 w-5 text-gray-600 cursor-pointer hover:text-black transition-colors" 
-                onClick={() => setIsSearching(!isSearching)}
-              />
-              {isSearching && (
-                <div className="absolute top-8 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-64">
-                  <input
-                    type="text"
-                    placeholder="Search menu items..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                    autoFocus
+          {/* Category Navigation Bar - Hidden on mobile, shown on desktop */}
+          <div className="bg-white border-b border-gray-200 px-6 py-4 hidden lg:block">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="relative search-container">
+                  <Search 
+                    className="h-5 w-5 text-gray-600 cursor-pointer hover:text-black transition-colors" 
+                    onClick={() => setIsSearching(!isSearching)}
                   />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
-                    >
-                      ✕
-                    </button>
+                  {isSearching && (
+                    <div className="absolute top-8 left-0 z-10 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-64">
+                      <input
+                        type="text"
+                        placeholder="Search menu items..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        autoFocus
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
-            <div className="flex space-x-2">
-              <button 
-                onClick={() => onCategorySelect('home')}
-                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'home' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-              >
-                HOME
-              </button>
-              <button 
-                onClick={() => onCategorySelect('grilledburger')}
-                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'grilledburger' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-              >
-                GRILLEDBURGER
-              </button>
-              <button 
-                onClick={() => onCategorySelect('chickensandwich')}
-                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'chickensandwich' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-              >
-                CHICKENSANDWICH
-              </button>
-              <button 
-                onClick={() => onCategorySelect('pickapicka')}
-                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'pickapicka' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-              >
-                PICKA-PICKA
-              </button>
-              <button 
-                onClick={() => onCategorySelect('drinks')}
-                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'drinks' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-              >
-                DRINKS
-              </button>
-              <button 
-                onClick={() => onCategorySelect('addons')}
-                className={`px-3 py-1 rounded text-sm ${selectedCategory === 'addons' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-              >
-                ADD ONS
-              </button>
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => onCategorySelect('home')}
+                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'home' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+                  >
+                    HOME
+                  </button>
+                  <button 
+                    onClick={() => onCategorySelect('grilledburger')}
+                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'grilledburger' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+                  >
+                    GRILLEDBURGER
+                  </button>
+                  <button 
+                    onClick={() => onCategorySelect('chickensandwich')}
+                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'chickensandwich' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+                  >
+                    CHICKENSANDWICH
+                  </button>
+                  <button 
+                    onClick={() => onCategorySelect('pickapicka')}
+                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'pickapicka' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+                  >
+                    PICKA-PICKA
+                  </button>
+                  <button 
+                    onClick={() => onCategorySelect('drinks')}
+                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'drinks' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+                  >
+                    DRINKS
+                  </button>
+                  <button 
+                    onClick={() => onCategorySelect('addons')}
+                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'addons' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+                  >
+                    ADD ONS
+                  </button>
+                </div>
+              </div>
+              
             </div>
           </div>
-          
-        </div>
-      </div>
 
       {/* Menu Content */}
       <div className="p-4 lg:p-6 lg:pr-8">
@@ -176,8 +176,8 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
             </h2>
             <p className="text-sm text-gray-600">
               Found {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
-            </p>
-          </div>
+        </p>
+      </div>
         )}
         
         {!searchQuery && selectedCategory !== 'home' && (
@@ -233,8 +233,8 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
                   <div className="text-lg lg:text-2xl font-bold text-black">
                     ₱{item.basePrice.toFixed(2)}
                   </div>
-                </div>
-                
+            </div>
+            
                 {/* Quantity Controls - Bottom Right */}
                 <div className="flex items-center">
                   {quantity > 0 ? (
@@ -263,9 +263,9 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
                   )}
                 </div>
               </div>
-            );
-          })}
-          </div>
+                );
+              })}
+            </div>
         )}
       </div>
 

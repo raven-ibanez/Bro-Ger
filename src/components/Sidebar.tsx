@@ -20,7 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
   ];
 
   return (
-    <div className="w-full lg:w-80 bg-white border-r border-gray-200 p-4 lg:p-6 space-y-4 lg:space-y-6">
+    <div className="hidden lg:block w-full lg:w-80 bg-white border-r border-gray-200 p-4 lg:p-6 space-y-4 lg:space-y-6">
       {/* About Us Card */}
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h3 className="font-semibold text-black text-lg mb-3">ABOUT US</h3>

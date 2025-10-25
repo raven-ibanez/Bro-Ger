@@ -1,12 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingCart, Search } from 'lucide-react';
 
 interface HeaderProps {
   cartItemsCount: number;
   onCartClick: () => void;
+  onSearchClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick }) => {
+const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onSearchClick }) => {
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchClick = () => {
+    if (onSearchClick) {
+      onSearchClick();
+    } else {
+      setIsSearching(!isSearching);
+    }
+  };
+
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="px-6 py-4">
@@ -16,8 +28,42 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick }) => {
           
           {/* Right side - Search and Cart */}
           <div className="flex items-center space-x-4">
-            {/* Search Icon */}
-            <Search className="h-5 w-5 text-gray-600" />
+            {/* Mobile Search */}
+            <div className="lg:hidden">
+              {isSearching ? (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearching(false);
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleSearchClick}
+                  className="p-2 text-gray-600 hover:text-black transition-colors duration-200"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+
+            {/* Desktop Search Icon */}
+            <div className="hidden lg:block">
+              <Search className="h-5 w-5 text-gray-600" />
+            </div>
             
             {/* Cart */}
             <button 
