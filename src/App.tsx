@@ -96,7 +96,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col lg:flex-row p-2 lg:p-4">
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row p-0 lg:p-4">
       {/* Sidebar */}
       <div className="hidden lg:block lg:w-80">
         <Sidebar 

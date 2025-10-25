@@ -222,11 +222,55 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
             </div>
           </div>
 
-          {/* Add-ons indicator */}
+          {/* Add-ons Display with Quantity Controls */}
           {item.addOns && item.addOns.length > 0 && (
-            <div className="flex items-center space-x-1 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-lg">
-              <span>+</span>
-              <span>{item.addOns.length} add-on{item.addOns.length > 1 ? 's' : ''} available</span>
+            <div className="mt-4 border-t border-gray-200 pt-4">
+              <div className="text-xs font-medium text-gray-700 mb-3">Add-ons:</div>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {item.addOns.map((addOn) => {
+                  const selectedAddOn = selectedAddOns.find(a => a.id === addOn.id);
+                  return (
+                    <div key={addOn.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm text-gray-900">{addOn.name}</span>
+                        <div className="text-xs text-gray-600">
+                          {addOn.price > 0 ? `₱${addOn.price.toFixed(2)}` : 'Free'}
+                        </div>
+                      </div>
+                      
+                      {selectedAddOn ? (
+                        <div className="flex items-center space-x-2 bg-red-100 rounded-lg p-1 border border-red-200">
+                          <button
+                            type="button"
+                            onClick={() => updateAddOnQuantity(addOn, selectedAddOn.quantity - 1)}
+                            className="p-1 hover:bg-red-200 rounded transition-colors duration-200"
+                          >
+                            <Minus className="h-3 w-3 text-red-600" />
+                          </button>
+                          <span className="font-semibold text-gray-900 min-w-[20px] text-center text-xs">
+                            {selectedAddOn.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateAddOnQuantity(addOn, selectedAddOn.quantity + 1)}
+                            className="p-1 hover:bg-red-200 rounded transition-colors duration-200"
+                          >
+                            <Plus className="h-3 w-3 text-red-600" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => updateAddOnQuantity(addOn, 1)}
+                          className="px-3 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium"
+                        >
+                          Add
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -236,17 +280,17 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
       {showCustomization && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-2xl">
-              <div>
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
+              <div className="flex items-center justify-between mb-3">
                 <h3 className="text-xl font-semibold text-gray-900">Customize {item.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">Choose your preferences</p>
+                <button
+                  onClick={() => setShowCustomization(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
               </div>
-              <button
-                onClick={() => setShowCustomization(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-              >
-                <X className="h-5 w-5 text-gray-500" />
-              </button>
+              <p className="text-sm text-gray-600 mt-2">{item.description}</p>
             </div>
 
             <div className="p-6">

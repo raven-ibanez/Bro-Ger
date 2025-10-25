@@ -20,6 +20,8 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
   const [showQuantityModal, setShowQuantityModal] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<MenuItem | null>(null);
   const [quantity, setQuantity] = React.useState(1);
+  const [selectedAddOns, setSelectedAddOns] = React.useState<Record<string, number>>({});
+  const [selectedVariation, setSelectedVariation] = React.useState<string | null>(null);
 
   // Filter menu items based on selected category and search query
   const filteredItems = React.useMemo(() => {
@@ -45,15 +47,32 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
   const handleAddToCart = (item: MenuItem) => {
     setSelectedItem(item);
     setQuantity(1);
+    setSelectedAddOns({});
+    setSelectedVariation(item.variations && item.variations.length > 0 ? item.variations[0].id : null);
     setShowQuantityModal(true);
   };
 
   const handleConfirmAddToCart = () => {
     if (selectedItem) {
-      addToCart(selectedItem, quantity);
+      // Convert selected add-ons to array format
+      const addOnsArray = Object.entries(selectedAddOns)
+        .filter(([_, qty]) => qty > 0)
+        .flatMap(([addOnId, qty]) => {
+          const addOn = selectedItem.addOns?.find(a => a.id === addOnId);
+          return addOn ? Array(qty).fill(addOn) : [];
+        });
+      
+      // Find the selected variation object
+      const variationObj = selectedVariation 
+        ? selectedItem.variations?.find(v => v.id === selectedVariation)
+        : undefined;
+      
+      addToCart(selectedItem, quantity, variationObj, addOnsArray);
       setShowQuantityModal(false);
       setSelectedItem(null);
       setQuantity(1);
+      setSelectedAddOns({});
+      setSelectedVariation(null);
     }
   };
 
@@ -61,6 +80,18 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
     setShowQuantityModal(false);
     setSelectedItem(null);
     setQuantity(1);
+    setSelectedAddOns({});
+    setSelectedVariation(null);
+  };
+
+  const updateAddOnQuantity = (addOnId: string, newQuantity: number) => {
+    setSelectedAddOns(prev => {
+      if (newQuantity <= 0) {
+        const { [addOnId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [addOnId]: newQuantity };
+    });
   };
 
   const handleUpdateQuantity = (item: MenuItem, quantity: number) => {
@@ -271,60 +302,123 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
 
       {/* Quantity Selection Modal */}
       {showQuantityModal && selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <div className="flex items-center mb-4">
-              <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center mr-4">
-                {selectedItem.image ? (
-                  <img 
-                    src={selectedItem.image} 
-                    alt={selectedItem.name}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <div className="text-gray-400 text-2xl">🍔</div>
-                )}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-md w-full my-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-start mb-4">
+                <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                  {selectedItem.image ? (
+                    <img 
+                      src={selectedItem.image} 
+                      alt={selectedItem.name}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-gray-400 text-2xl">🍔</div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-1">{selectedItem.name}</h3>
+                  <p className="text-gray-600 text-lg mb-2">₱{selectedItem.basePrice.toFixed(2)}</p>
+                  {selectedItem.description && (
+                    <p className="text-sm text-gray-500">{selectedItem.description}</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-lg">{selectedItem.name}</h3>
-                <p className="text-gray-600">₱{selectedItem.basePrice.toFixed(2)}</p>
-              </div>
-            </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Quantity
-              </label>
-              <div className="flex items-center space-x-4">
+              {/* Size Variations Section */}
+              {selectedItem.variations && selectedItem.variations.length > 0 && (
+                <div className="mb-6 border-t border-gray-200 pt-4">
+                  <h4 className="font-medium text-gray-900 mb-3">Choose Size</h4>
+                  <div className="space-y-2">
+                    {selectedItem.variations.map((variation) => {
+                      const isSelected = selectedVariation === variation.id;
+                      const variationPrice = variation.price;
+                      
+                      return (
+                        <button
+                          key={variation.id}
+                          onClick={() => setSelectedVariation(variation.id)}
+                          className={`w-full p-3 rounded-lg border-2 text-left transition-colors ${
+                            isSelected
+                              ? 'border-black bg-gray-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-gray-900">{variation.name}</span>
+                            <span className="text-sm text-gray-600">₱{variation.price.toFixed(2)}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Add-ons Section */}
+              {selectedItem.addOns && selectedItem.addOns.length > 0 && (
+                <div className="mb-6 border-t border-gray-200 pt-4">
+                  <h4 className="font-medium text-gray-900 mb-3">Add-ons</h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {selectedItem.addOns.map((addOn) => {
+                      const currentQty = selectedAddOns[addOn.id] || 0;
+                      return (
+                        <div key={addOn.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm text-gray-900 block">{addOn.name}</span>
+                            <span className="text-xs text-gray-600">
+                              {addOn.price > 0 ? `₱${addOn.price.toFixed(2)}` : 'Free'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => updateAddOnQuantity(addOn.id, currentQty > 0 ? 0 : 1)}
+                            className="px-3 py-1 bg-black text-white text-xs rounded-lg hover:bg-gray-800 transition-colors"
+                          >
+                            {currentQty > 0 ? 'Remove' : 'Add'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quantity
+                </label>
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                  >
+                    <span className="text-lg">-</span>
+                  </button>
+                  <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                  >
+                    <span className="text-lg">+</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                  onClick={handleCloseModal}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                 >
-                  <span className="text-lg">-</span>
+                  Cancel
                 </button>
-                <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300"
+                  onClick={handleConfirmAddToCart}
+                  className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
                 >
-                  <span className="text-lg">+</span>
+                  Add to Cart
                 </button>
               </div>
-            </div>
-
-            <div className="flex space-x-3">
-              <button
-                onClick={handleCloseModal}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmAddToCart}
-                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
-              >
-                Add to Cart
-              </button>
             </div>
           </div>
         </div>

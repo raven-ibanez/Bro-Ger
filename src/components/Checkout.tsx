@@ -322,24 +322,32 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
           
           <div className="grid grid-cols-1 gap-4 mb-6">
             {paymentMethods.map((method) => (
-              <button
-                key={method.id}
-                type="button"
-                onClick={() => setPaymentMethod(method.id as PaymentMethod)}
-                className={`p-4 rounded-lg border-2 transition-all duration-200 flex items-center space-x-3 ${
-                  paymentMethod === method.id
-                    ? 'border-black bg-black text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                }`}
-              >
-                <span className="text-2xl">💳</span>
-                <span className="font-medium">{method.name}</span>
-              </button>
+              <div key={method.id}>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod(method.id as PaymentMethod)}
+                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center space-x-3 ${
+                    paymentMethod === method.id
+                      ? 'border-black bg-black text-white'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  <span className="text-2xl">💳</span>
+                  <span className="font-medium">{method.name}</span>
+                </button>
+                {method.id === 'cash-on-delivery' && (
+                  <div className="mt-2 ml-3 bg-amber-50 border border-amber-200 rounded-lg p-2">
+                    <p className="text-xs font-medium text-amber-700">
+                      ⚠️ For repeated customers only
+                    </p>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
 
           {/* Payment Details with QR Code */}
-          {selectedPaymentMethod && (
+          {selectedPaymentMethod && selectedPaymentMethod.id !== 'cash-on-delivery' && (
             <div className="bg-gray-50 rounded-lg p-6 mb-6">
               <h3 className="font-medium text-black mb-4">Payment Details</h3>
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -349,7 +357,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                   <p className="text-sm text-gray-600 mb-3">Account Name: {selectedPaymentMethod.account_name}</p>
                   <p className="text-xl font-semibold text-black">Amount: ₱{totalPrice}</p>
                 </div>
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 hidden md:block">
                   <img 
                     src={selectedPaymentMethod.qr_code_url} 
                     alt={`${selectedPaymentMethod.name} QR Code`}
@@ -365,12 +373,14 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
           )}
 
           {/* Reference Number */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h4 className="font-medium text-black mb-2">📸 Payment Proof Required</h4>
-            <p className="text-sm text-gray-700">
-              After making your payment, please take a screenshot of your payment receipt and attach it when you send your order via Messenger. This helps us verify and process your order quickly.
-            </p>
-          </div>
+          {selectedPaymentMethod && selectedPaymentMethod.id !== 'cash-on-delivery' && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="font-medium text-black mb-2">📸 Payment Proof Required</h4>
+              <p className="text-sm text-gray-700">
+                After making your payment, please take a screenshot of your payment receipt and attach it when you send your order via Messenger. This helps us verify and process your order quickly.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Order Summary */}
