@@ -357,7 +357,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                   <p className="text-sm text-gray-600 mb-3">Account Name: {selectedPaymentMethod.account_name}</p>
                   <p className="text-xl font-semibold text-black">Amount: ₱{totalPrice}</p>
                 </div>
-                <div className="flex-shrink-0 hidden md:block">
+                <div className="flex-shrink-0">
                   <img 
                     src={selectedPaymentMethod.qr_code_url} 
                     alt={`${selectedPaymentMethod.name} QR Code`}
