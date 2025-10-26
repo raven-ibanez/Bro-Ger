@@ -260,7 +260,12 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
                 
                 {/* Product Info - Right Side */}
                 <div className="flex-1">
-                  <h3 className="font-medium text-black text-lg lg:text-2xl mb-2 lg:mb-3">{item.name}</h3>
+                  <h3 className="font-medium text-black text-lg lg:text-2xl mb-1 lg:mb-2">{item.name}</h3>
+                  {item.description && (
+                    <p className="text-sm lg:text-base text-gray-600 mb-2 lg:mb-3 line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
                   <div className="text-lg lg:text-2xl font-bold text-black">
                     ₱{item.basePrice.toFixed(2)}
                   </div>

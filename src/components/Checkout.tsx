@@ -335,7 +335,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                   <span className="text-2xl">💳</span>
                   <span className="font-medium">{method.name}</span>
                 </button>
-                {method.id === 'cash-on-delivery' && (
+                {method.id === 'cash-on-delivery' && paymentMethod === 'cash-on-delivery' && (
                   <div className="mt-2 ml-3 bg-amber-50 border border-amber-200 rounded-lg p-2">
                     <p className="text-xs font-medium text-amber-700">
                       ⚠️ For repeated customers only
