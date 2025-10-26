@@ -100,6 +100,22 @@ const ReviewsDisplay: React.FC<ReviewsDisplayProps> = ({ showAddReview = true })
                   </div>
                   <h4 className="font-medium text-gray-900 mb-2 text-sm md:text-base">{review.title}</h4>
                   <p className="text-gray-600 text-xs md:text-sm mb-3 line-clamp-3">{review.content}</p>
+                  
+                  {/* Review Images */}
+                  {review.images && review.images.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      {review.images.slice(0, 2).map((imageUrl, index) => (
+                        <img
+                          key={index}
+                          src={imageUrl}
+                          alt={`Review photo ${index + 1}`}
+                          className="w-full h-20 object-cover rounded border border-purple-200 cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => window.open(imageUrl, '_blank')}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  
                   <div className="flex items-center justify-between text-xs md:text-sm text-gray-500 flex-wrap gap-1">
                     <span>{review.customer_name}</span>
                     <span>{formatDate(review.created_at)}</span>
@@ -135,6 +151,21 @@ const ReviewsDisplay: React.FC<ReviewsDisplayProps> = ({ showAddReview = true })
                   </div>
                   
                   <p className="text-gray-600 mb-4 text-sm md:text-base">{review.content}</p>
+                  
+                  {/* Review Images */}
+                  {review.images && review.images.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-4">
+                      {review.images.map((imageUrl, index) => (
+                        <img
+                          key={index}
+                          src={imageUrl}
+                          alt={`Review photo ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => window.open(imageUrl, '_blank')}
+                        />
+                      ))}
+                    </div>
+                  )}
                   
                   <div className="flex items-center justify-between text-xs md:text-sm text-gray-500 flex-wrap gap-1">
                     <span>{review.customer_name}</span>

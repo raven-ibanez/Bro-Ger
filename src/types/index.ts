@@ -85,6 +85,7 @@ export interface Review {
   rating: number;
   title: string;
   content: string;
+  images?: string[];
   approved: boolean;
   featured: boolean;
   created_at: string;
@@ -97,4 +98,5 @@ export interface ReviewFormData {
   rating: number;
   title: string;
   content: string;
+  images?: string[];
 }

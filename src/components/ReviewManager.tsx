@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Edit, Trash2, Check, X, Eye, EyeOff, ArrowLeft, MessageSquare, TrendingUp, Users, StarIcon } from 'lucide-react';
+import { Star, Edit, Trash2, Check, X, Eye, EyeOff, ArrowLeft, MessageSquare, TrendingUp, Users, StarIcon, Image as ImageIcon } from 'lucide-react';
 import { useReviews } from '../hooks/useReviews';
 import { Review } from '../types';
 
@@ -264,6 +264,18 @@ const ReviewManager: React.FC<ReviewManagerProps> = ({ onBack }) => {
                       
                       <p className="text-gray-600 mb-3 line-clamp-2">{review.content}</p>
                       
+                      {/* Review Images */}
+                      {review.images && review.images.length > 0 && (
+                        <div className="flex items-center space-x-2 mb-3">
+                          <div className="flex items-center space-x-2">
+                            <ImageIcon className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm text-gray-500">
+                              {review.images.length} photo{review.images.length > 1 ? 's' : ''}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <span>By {review.customer_name}</span>
                         <span>•</span>
@@ -366,6 +378,27 @@ const ReviewManager: React.FC<ReviewManagerProps> = ({ onBack }) => {
                   <p className="text-gray-700">{selectedReview.content}</p>
                 </div>
                 
+                {/* Review Images */}
+                {selectedReview.images && selectedReview.images.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      Customer Photos ({selectedReview.images.length})
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {selectedReview.images.map((imageUrl, index) => (
+                        <img
+                          key={index}
+                          src={imageUrl}
+                          alt={`Review photo ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => window.open(imageUrl, '_blank')}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="border-t border-gray-200 pt-4">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
@@ -388,6 +421,12 @@ const ReviewManager: React.FC<ReviewManagerProps> = ({ onBack }) => {
                         {selectedReview.approved ? 'Approved' : 'Pending'}
                       </span>
                     </div>
+                    {selectedReview.images && selectedReview.images.length > 0 && (
+                      <div>
+                        <span className="font-medium text-gray-900">Photos:</span>
+                        <span className="ml-2 text-gray-600">{selectedReview.images.length} image{selectedReview.images.length > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

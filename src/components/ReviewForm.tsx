@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Star, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { useReviews } from '../hooks/useReviews';
 import { ReviewFormData } from '../types';
+import ReviewImageUpload from './ReviewImageUpload';
 
 interface ReviewFormProps {
   onClose?: () => void;
@@ -14,13 +15,14 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onClose }) => {
     customer_email: '',
     rating: 5,
     title: '',
-    content: ''
+    content: '',
+    images: []
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange = (field: keyof ReviewFormData, value: string | number) => {
+  const handleInputChange = (field: keyof ReviewFormData, value: string | number | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -45,7 +47,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onClose }) => {
         customer_email: '',
         rating: 5,
         title: '',
-        content: ''
+        content: '',
+        images: []
       });
     } catch (err) {
       setError('Failed to submit review. Please try again.');
@@ -168,6 +171,13 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onClose }) => {
             required
           />
         </div>
+
+        {/* Image Upload */}
+        <ReviewImageUpload
+          currentImages={formData.images || []}
+          onImagesChange={(images) => setFormData(prev => ({ ...prev, images }))}
+          maxImages={5}
+        />
 
         {/* Submit Button */}
         <div className="flex items-center justify-end space-x-3">
