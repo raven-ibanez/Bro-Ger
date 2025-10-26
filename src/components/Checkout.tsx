@@ -100,8 +100,8 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
 
   if (step === 'details') {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center mb-8">
+      <div className="w-full px-2 py-4">
+        <div className="flex items-center mb-4">
           <button
             onClick={onBack}
             className="flex items-center space-x-2 text-gray-600 hover:text-black transition-colors duration-200"
@@ -109,15 +109,15 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
             <ArrowLeft className="h-5 w-5" />
             <span>Back to Cart</span>
           </button>
-          <h1 className="text-3xl font-noto font-semibold text-black ml-8">Order Details</h1>
+          <h1 className="text-2xl font-noto font-semibold text-black ml-4">Order Details</h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Order Summary */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-2xl font-noto font-medium text-black mb-6">Order Summary</h2>
+          <div className="bg-white rounded-xl shadow-sm p-4">
+            <h2 className="text-xl font-noto font-medium text-black mb-4">Order Summary</h2>
             
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4 mb-4">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex items-center justify-between py-2 border-b border-gray-200">
                   <div>
@@ -146,10 +146,10 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
           </div>
 
           {/* Customer Details Form */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-2xl font-noto font-medium text-black mb-6">Customer Information</h2>
+          <div className="bg-white rounded-xl shadow-sm p-4">
+            <h2 className="text-xl font-noto font-medium text-black mb-4">Customer Information</h2>
             
-            <form className="space-y-6">
+            <form className="space-y-4">
               {/* Customer Information */}
               <div>
                 <label className="block text-sm font-medium text-black mb-2">Full Name *</label>
@@ -303,8 +303,8 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
 
   // Payment Step
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center mb-8">
+    <div className="w-full px-2 py-4">
+      <div className="flex items-center mb-4">
         <button
           onClick={() => setStep('details')}
           className="flex items-center space-x-2 text-gray-600 hover:text-black transition-colors duration-200"
@@ -312,15 +312,15 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
           <ArrowLeft className="h-5 w-5" />
           <span>Back to Details</span>
         </button>
-        <h1 className="text-3xl font-noto font-semibold text-black ml-8">Payment</h1>
+        <h1 className="text-2xl font-noto font-semibold text-black ml-4">Payment</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Payment Method Selection */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-2xl font-noto font-medium text-black mb-6">Choose Payment Method</h2>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h2 className="text-xl font-noto font-medium text-black mb-4">Choose Payment Method</h2>
           
-          <div className="grid grid-cols-1 gap-4 mb-6">
+          <div className="grid grid-cols-1 gap-4 mb-4">
             {paymentMethods.map((method) => (
               <div key={method.id}>
                 <button
@@ -348,7 +348,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
 
           {/* Payment Details with QR Code */}
           {selectedPaymentMethod && selectedPaymentMethod.id !== 'cash-on-delivery' && (
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
               <h3 className="font-medium text-black mb-4">Payment Details</h3>
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex-1">

@@ -148,6 +148,11 @@ const App: React.FC = () => {
               cartItemsCount={getTotalItems()}
               onCartClick={handleCartClick}
             />
+            {/* Mobile Navigation */}
+            <MobileNav
+              activeCategory={selectedCategory}
+              onCategoryClick={handleCategorySelect}
+            />
             <Menu
               menuItems={menuItems}
               addToCart={addToCart}
