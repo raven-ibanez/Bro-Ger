@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Clock } from 'lucide-react';
+import { ArrowLeft, Clock, Info } from 'lucide-react';
 import { CartItem, PaymentMethod, ServiceType } from '../types';
 import { usePaymentMethods } from '../hooks/usePaymentMethods';
+import { useSidebarContent } from '../hooks/useSidebarContent';
 
 interface CheckoutProps {
   cartItems: CartItem[];
@@ -11,6 +12,7 @@ interface CheckoutProps {
 
 const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) => {
   const { paymentMethods } = usePaymentMethods();
+  const { content: sidebarContent, loading: sidebarLoading } = useSidebarContent();
   const [step, setStep] = useState<'details' | 'payment'>('details');
   const [customerName, setCustomerName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
@@ -19,11 +21,7 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) =>
   const [landmark, setLandmark] = useState('');
   const [pickupTime, setPickupTime] = useState('5-10');
   const [customTime, setCustomTime] = useState('');
-  // Dine-in specific state
-  const [partySize, setPartySize] = useState(1);
-  const [dineInTime, setDineInTime] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('gcash');
-  const [referenceNumber, setReferenceNumber] = useState('');
   const [notes, setNotes] = useState('');
 
   React.useEffect(() => {
@@ -197,6 +195,37 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                       <div className="text-sm font-medium">{option.label}</div>
                     </button>
                   ))}
+                </div>
+                
+                {/* Service Information */}
+                <div className="mt-4 space-y-3">
+                  {serviceType === 'delivery' && sidebarContent.deliveryInfo && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-start space-x-2">
+                        <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-sm font-medium text-blue-900 mb-1">Delivery Information</h4>
+                          <p className="text-sm text-blue-700">
+                            {sidebarLoading ? 'Loading...' : sidebarContent.deliveryInfo}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {serviceType === 'pickup' && sidebarContent.pickupInfo && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <div className="flex items-start space-x-2">
+                        <Info className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-sm font-medium text-green-900 mb-1">Pickup Information</h4>
+                          <p className="text-sm text-green-700">
+                            {sidebarLoading ? 'Loading...' : sidebarContent.pickupInfo}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, ChevronDown, ChevronRight } from 'lucide-react';
+import { useSidebarContent } from '../hooks/useSidebarContent';
 
 interface DeliveryModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface DeliveryModalProps {
 const DeliveryModal: React.FC<DeliveryModalProps> = ({ isOpen, onClose }) => {
   const [expandedDelivery, setExpandedDelivery] = useState(false);
   const [expandedPickup, setExpandedPickup] = useState(false);
+  const { content, loading } = useSidebarContent();
 
   if (!isOpen) return null;
 
@@ -43,7 +45,9 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isOpen, onClose }) => {
             </button>
             {expandedDelivery && (
               <div className="mt-2 pl-4">
-                <p className="text-sm text-gray-600">Within bagong barrio</p>
+                <p className="text-sm text-gray-600">
+                  {loading ? 'Loading...' : content.deliveryInfo || 'Within bagong barrio'}
+                </p>
               </div>
             )}
           </div>
@@ -63,7 +67,9 @@ const DeliveryModal: React.FC<DeliveryModalProps> = ({ isOpen, onClose }) => {
             </button>
             {expandedPickup && (
               <div className="mt-2 pl-4">
-                <p className="text-sm text-gray-600">Pickup time: WE WILL CONTACT YOU ONCE YOUR ORDER IS DONE</p>
+                <p className="text-sm text-gray-600">
+                  {loading ? 'Loading...' : content.pickupInfo || 'Pickup time: WE WILL CONTACT YOU ONCE YOUR ORDER IS DONE'}
+                </p>
               </div>
             )}
           </div>
