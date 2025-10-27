@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Clock, Info } from 'lucide-react';
-import { CartItem, PaymentMethod, ServiceType } from '../types';
+import { CartItem, PaymentMethod } from '../types';
 import { usePaymentMethods } from '../hooks/usePaymentMethods';
-import { useSidebarContent } from '../hooks/useSidebarContent';
+import { useServiceOptions } from '../hooks/useServiceOptions';
 
 interface CheckoutProps {
   cartItems: CartItem[];
@@ -12,11 +12,11 @@ interface CheckoutProps {
 
 const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) => {
   const { paymentMethods } = usePaymentMethods();
-  const { content: sidebarContent, loading: sidebarLoading } = useSidebarContent();
+  const { serviceOptions } = useServiceOptions();
   const [step, setStep] = useState<'details' | 'payment'>('details');
   const [customerName, setCustomerName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
-  const [serviceType, setServiceType] = useState<ServiceType>('dine-in');
+  const [serviceType, setServiceType] = useState<string>(serviceOptions.length > 0 ? serviceOptions[0].id : '');
   const [address, setAddress] = useState('');
   const [landmark, setLandmark] = useState('');
   const [pickupTime, setPickupTime] = useState('5-10');
@@ -35,6 +35,13 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) =>
     }
   }, [paymentMethods, paymentMethod]);
 
+  // Set default service type when service options are loaded
+  React.useEffect(() => {
+    if (serviceOptions.length > 0 && !serviceType) {
+      setServiceType(serviceOptions[0].id);
+    }
+  }, [serviceOptions, serviceType]);
+
   const selectedPaymentMethod = paymentMethods.find(method => method.id === paymentMethod);
 
   const handleProceedToPayment = () => {
@@ -42,19 +49,23 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) =>
   };
 
   const handlePlaceOrder = () => {
-    const timeInfo = serviceType === 'pickup' 
+    const selectedService = serviceOptions.find(opt => opt.id === serviceType);
+    const serviceName = selectedService?.name || serviceType.charAt(0).toUpperCase() + serviceType.slice(1);
+    
+    const lowerServiceType = serviceType.toLowerCase();
+    const isPickup = lowerServiceType.includes('pickup');
+    const timeInfo = isPickup 
       ? (pickupTime === 'custom' ? customTime : `${pickupTime} minutes`)
       : '';
-    
     
     const orderDetails = `
 🛒 Bro-Ger ORDER
 
 👤 Customer: ${customerName}
 📞 Contact: ${contactNumber}
-📍 Service: ${serviceType.charAt(0).toUpperCase() + serviceType.slice(1)}
-${serviceType === 'delivery' ? `🏠 Address: ${address}${landmark ? `\n🗺️ Landmark: ${landmark}` : ''}` : ''}
-${serviceType === 'pickup' ? `⏰ Pickup Time: ${timeInfo}` : ''}
+📍 Service: ${serviceName}
+${!isPickup ? `🏠 Address: ${address}${landmark ? `\n🗺️ Landmark: ${landmark}` : ''}` : ''}
+${isPickup ? `⏰ Pickup Time: ${timeInfo}` : ''}
 
 
 📋 ORDER DETAILS:
@@ -75,7 +86,7 @@ ${cartItems.map(item => {
 }).join('\n')}
 
 💰 TOTAL: ₱${totalPrice}
-${serviceType === 'delivery' ? `🛵 DELIVERY FEE:` : ''}
+${!isPickup ? `🛵 DELIVERY FEE:` : ''}
 
 💳 Payment: ${selectedPaymentMethod?.name || paymentMethod}
 📸 Payment Screenshot: Please attach your payment receipt screenshot
@@ -92,9 +103,15 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
     
   };
 
-  const isDetailsValid = customerName && contactNumber && 
-    (serviceType !== 'delivery' || address) && 
-    (serviceType !== 'pickup' || (pickupTime !== 'custom' || customTime));
+  const isDetailsValid = (() => {
+    const hasName = customerName && contactNumber;
+    const lowerServiceType = serviceType.toLowerCase();
+    const isPickup = lowerServiceType.includes('pickup');
+    
+    return hasName && 
+      (!isPickup ? address : true) && 
+      (!isPickup || (pickupTime !== 'custom' || customTime));
+  })();
 
   if (step === 'details') {
     return (
@@ -176,62 +193,50 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
               {/* Service Type */}
               <div>
                 <label className="block text-sm font-medium text-black mb-3">Service Type *</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { value: 'pickup', label: 'Pickup', icon: '🚶' },
-                    { value: 'delivery', label: 'Delivery', icon: '🛵' }
-                  ].map((option) => (
+                <div className="flex flex-col gap-3">
+                  {serviceOptions.map((option) => (
                     <button
-                      key={option.value}
+                      key={option.id}
                       type="button"
-                      onClick={() => setServiceType(option.value as ServiceType)}
-                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                        serviceType === option.value
-                          ? 'border-black bg-black text-white'
-                          : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                      onClick={() => setServiceType(option.id)}
+                      className={`py-5 rounded-xl border-2 transition-all duration-300 flex items-center justify-center w-full ${
+                        serviceType === option.id
+                          ? 'border-black bg-black text-white shadow-lg scale-[1.01]'
+                          : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50 hover:shadow-md'
                       }`}
                     >
-                      <div className="text-2xl mb-1">{option.icon}</div>
-                      <div className="text-sm font-medium">{option.label}</div>
+                      <div className={`text-xl font-semibold ${serviceType === option.id ? 'text-white' : 'text-gray-700'}`}>
+                        {option.name}
+                      </div>
                     </button>
                   ))}
                 </div>
                 
                 {/* Service Information */}
                 <div className="mt-4 space-y-3">
-                  {serviceType === 'delivery' && sidebarContent.deliveryInfo && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <div className="flex items-start space-x-2">
-                        <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <h4 className="text-sm font-medium text-blue-900 mb-1">Delivery Information</h4>
-                          <p className="text-sm text-blue-700">
-                            {sidebarLoading ? 'Loading...' : sidebarContent.deliveryInfo}
-                          </p>
+                  {(() => {
+                    const selectedService = serviceOptions.find(opt => opt.id === serviceType);
+                    if (selectedService?.description) {
+                      return (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="flex items-start space-x-2">
+                            <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <h4 className="text-sm font-medium text-blue-900 mb-1">{selectedService.name} Information</h4>
+                              <p className="text-sm text-blue-700">{selectedService.description}</p>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {serviceType === 'pickup' && sidebarContent.pickupInfo && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <div className="flex items-start space-x-2">
-                        <Info className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <h4 className="text-sm font-medium text-green-900 mb-1">Pickup Information</h4>
-                          <p className="text-sm text-green-700">
-                            {sidebarLoading ? 'Loading...' : sidebarContent.pickupInfo}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </div>
 
 
               {/* Pickup Time Selection */}
-              {serviceType === 'pickup' && (
+              {serviceType.includes('pickup') && (
                 <div>
                   <label className="block text-sm font-medium text-black mb-3">Pickup Time *</label>
                   <div className="space-y-3">
@@ -246,14 +251,19 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                           key={option.value}
                           type="button"
                           onClick={() => setPickupTime(option.value)}
-                          className={`p-3 rounded-lg border-2 transition-all duration-200 text-sm ${
+                          className={`relative p-4 rounded-xl border-2 transition-all duration-300 text-sm flex flex-col items-center justify-center min-h-[80px] ${
                             pickupTime === option.value
-                              ? 'border-black bg-black text-white'
-                              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                              ? 'border-black bg-black text-white shadow-lg scale-[1.02]'
+                              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50 hover:shadow-md'
                           }`}
                         >
-                          <Clock className="h-4 w-4 mx-auto mb-1" />
-                          {option.label}
+                          <Clock className={`h-5 w-5 mb-2 ${pickupTime === option.value ? 'text-white' : 'text-gray-600'}`} />
+                          <span className="font-medium">{option.label}</span>
+                          {pickupTime === option.value && (
+                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg">
+                              <div className="w-2 h-2 bg-black rounded-full"></div>
+                            </div>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -273,7 +283,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
               )}
 
               {/* Delivery Address */}
-              {serviceType === 'delivery' && (
+              {!serviceType.toLowerCase().includes('pickup') && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">Delivery Address *</label>
@@ -421,14 +431,14 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
               <h4 className="font-medium text-black mb-2">Customer Details</h4>
               <p className="text-sm text-gray-600">Name: {customerName}</p>
               <p className="text-sm text-gray-600">Contact: {contactNumber}</p>
-              <p className="text-sm text-gray-600">Service: {serviceType.charAt(0).toUpperCase() + serviceType.slice(1)}</p>
-              {serviceType === 'delivery' && (
+              <p className="text-sm text-gray-600">Service: {serviceOptions.find(opt => opt.id === serviceType)?.name || serviceType}</p>
+              {!serviceType.toLowerCase().includes('pickup') && (
                 <>
                   <p className="text-sm text-gray-600">Address: {address}</p>
                   {landmark && <p className="text-sm text-gray-600">Landmark: {landmark}</p>}
                 </>
               )}
-              {serviceType === 'pickup' && (
+              {serviceType.includes('pickup') && (
                 <p className="text-sm text-gray-600">
                   Pickup Time: {pickupTime === 'custom' ? customTime : `${pickupTime} minutes`}
                 </p>

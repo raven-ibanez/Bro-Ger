@@ -236,6 +236,38 @@ export type Database = {
           updated_at?: string;
         };
       };
+      service_options: {
+        Row: {
+          id: string;
+          name: string;
+          icon: string;
+          description: string | null;
+          active: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          name: string;
+          icon?: string;
+          description?: string | null;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          icon?: string;
+          description?: string | null;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 };

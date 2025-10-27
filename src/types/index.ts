@@ -59,6 +59,18 @@ export interface OrderData {
 export type PaymentMethod = 'gcash' | 'maya' | 'bank-transfer' | 'cash-on-delivery';
 export type ServiceType = 'dine-in' | 'pickup' | 'delivery';
 
+// Service Option Types
+export interface ServiceOption {
+  id: string;
+  name: string;
+  icon: string;
+  description?: string;
+  active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // Site Settings Types
 export interface SiteSetting {
   id: string;
