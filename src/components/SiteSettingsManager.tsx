@@ -11,7 +11,8 @@ const SiteSettingsManager: React.FC = () => {
     site_name: '',
     site_description: '',
     currency: '',
-    currency_code: ''
+    currency_code: '',
+    free_delivery_threshold: 350
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
@@ -24,7 +25,8 @@ const SiteSettingsManager: React.FC = () => {
         site_name: siteSettings.site_name,
         site_description: siteSettings.site_description,
         currency: siteSettings.currency,
-        currency_code: siteSettings.currency_code
+        currency_code: siteSettings.currency_code,
+        free_delivery_threshold: siteSettings.free_delivery_threshold
       });
       setLogoPreview(siteSettings.site_logo);
       setHeroImagePreview(siteSettings.hero_image);
@@ -32,10 +34,10 @@ const SiteSettingsManager: React.FC = () => {
   }, [siteSettings]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'number' ? parseFloat(value) || 0 : value
     }));
   };
 
@@ -87,7 +89,8 @@ const SiteSettingsManager: React.FC = () => {
         currency: formData.currency,
         currency_code: formData.currency_code,
         site_logo: logoUrl,
-        hero_image: heroImageUrl
+        hero_image: heroImageUrl,
+        free_delivery_threshold: formData.free_delivery_threshold
       });
 
       setIsEditing(false);
@@ -104,7 +107,8 @@ const SiteSettingsManager: React.FC = () => {
         site_name: siteSettings.site_name,
         site_description: siteSettings.site_description,
         currency: siteSettings.currency,
-        currency_code: siteSettings.currency_code
+        currency_code: siteSettings.currency_code,
+        free_delivery_threshold: siteSettings.free_delivery_threshold
       });
       setLogoPreview(siteSettings.site_logo);
       setHeroImagePreview(siteSettings.hero_image);
@@ -313,6 +317,32 @@ const SiteSettingsManager: React.FC = () => {
               <p className="text-lg font-medium text-black">{siteSettings?.currency_code}</p>
             )}
           </div>
+        </div>
+
+        {/* Free Delivery Threshold */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Free Delivery Threshold (₱)
+          </label>
+          {isEditing ? (
+            <div>
+              <input
+                type="number"
+                name="free_delivery_threshold"
+                value={formData.free_delivery_threshold}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                placeholder="e.g., 350"
+                min="0"
+                step="10"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Orders reaching this amount qualify for free in-house delivery
+              </p>
+            </div>
+          ) : (
+            <p className="text-lg font-medium text-black">₱{siteSettings?.free_delivery_threshold}</p>
+          )}
         </div>
       </div>
     </div>

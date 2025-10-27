@@ -26,7 +26,8 @@ export const useSiteSettings = () => {
         site_description: data.find(s => s.id === 'site_description')?.value || '',
         currency: data.find(s => s.id === 'currency')?.value || 'PHP',
         currency_code: data.find(s => s.id === 'currency_code')?.value || 'PHP',
-        hero_image: data.find(s => s.id === 'hero_image')?.value || 'https://amyfewmjpfplarkrevut.supabase.co/storage/v1/object/public/menu-images/1761372138519-5ciub5jsntb.jpg'
+        hero_image: data.find(s => s.id === 'hero_image')?.value || 'https://amyfewmjpfplarkrevut.supabase.co/storage/v1/object/public/menu-images/1761372138519-5ciub5jsntb.jpg',
+        free_delivery_threshold: parseFloat(data.find(s => s.id === 'free_delivery_threshold')?.value || '350')
       };
 
       setSiteSettings(settings);

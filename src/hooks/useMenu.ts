@@ -19,6 +19,7 @@ export const useMenu = () => {
           variations (*),
           add_ons (*)
         `)
+        .order('sort_order', { ascending: true })
         .order('created_at', { ascending: true });
 
       if (itemsError) throw itemsError;
@@ -44,6 +45,7 @@ export const useMenu = () => {
           category: item.category,
           popular: item.popular,
           available: item.available ?? true,
+          sort_order: item.sort_order || 0,
           image: item.image_url || undefined,
           discountPrice: item.discount_price || undefined,
           discountStartDate: item.discount_start_date || undefined,
@@ -87,6 +89,7 @@ export const useMenu = () => {
           category: item.category,
           popular: item.popular || false,
           available: item.available ?? true,
+          sort_order: item.sort_order || 0,
           image_url: item.image || null,
           discount_price: item.discountPrice || null,
           discount_start_date: item.discountStartDate || null,
@@ -149,6 +152,7 @@ export const useMenu = () => {
           category: updates.category,
           popular: updates.popular,
           available: updates.available,
+          sort_order: updates.sort_order !== undefined ? updates.sort_order : null,
           image_url: updates.image || null,
           discount_price: updates.discountPrice || null,
           discount_start_date: updates.discountStartDate || null,

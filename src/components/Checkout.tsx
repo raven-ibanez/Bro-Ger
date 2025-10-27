@@ -3,6 +3,7 @@ import { ArrowLeft, Clock, Info } from 'lucide-react';
 import { CartItem, PaymentMethod } from '../types';
 import { usePaymentMethods } from '../hooks/usePaymentMethods';
 import { useServiceOptions } from '../hooks/useServiceOptions';
+import { useSiteSettings } from '../hooks/useSiteSettings';
 
 interface CheckoutProps {
   cartItems: CartItem[];
@@ -13,6 +14,8 @@ interface CheckoutProps {
 const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) => {
   const { paymentMethods } = usePaymentMethods();
   const { serviceOptions } = useServiceOptions();
+  const { siteSettings } = useSiteSettings();
+  const freeDeliveryThreshold = siteSettings?.free_delivery_threshold || 350;
   const [step, setStep] = useState<'details' | 'payment'>('details');
   const [customerName, setCustomerName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
@@ -131,6 +134,19 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
           {/* Order Summary */}
           <div className="bg-white rounded-xl shadow-sm p-4">
             <h2 className="text-xl font-noto font-medium text-black mb-4">Order Summary</h2>
+            
+            {/* Free Delivery Banner */}
+            {totalPrice >= freeDeliveryThreshold && (
+              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3 mb-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-2xl">🎉</span>
+                  <div>
+                    <p className="text-sm font-semibold text-green-900">Free In-House Delivery!</p>
+                    <p className="text-xs text-green-700">Your order qualifies for free delivery.</p>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="space-y-4 mb-4">
               {cartItems.map((item) => (
@@ -425,6 +441,19 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
         {/* Order Summary */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-2xl font-noto font-medium text-black mb-6">Final Order Summary</h2>
+          
+          {/* Free Delivery Banner */}
+          {totalPrice >= freeDeliveryThreshold && (
+            <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3 mb-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl">🎉</span>
+                <div>
+                  <p className="text-sm font-semibold text-green-900">Free In-House Delivery!</p>
+                  <p className="text-xs text-green-700">Your order qualifies for free delivery.</p>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="space-y-4 mb-6">
             <div className="bg-gray-50 rounded-lg p-4">

@@ -21,6 +21,7 @@ export interface MenuItem {
   image?: string;
   popular?: boolean;
   available?: boolean;
+  sort_order?: number;
   variations?: Variation[];
   addOns?: AddOn[];
   // Discount pricing fields
@@ -87,6 +88,7 @@ export interface SiteSettings {
   currency: string;
   currency_code: string;
   hero_image: string;
+  free_delivery_threshold: number;
 }
 
 // Review Types

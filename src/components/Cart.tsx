@@ -1,6 +1,7 @@
 import React from 'react';
 import { Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
 import { CartItem } from '../types';
+import { useSiteSettings } from '../hooks/useSiteSettings';
 
 interface CartProps {
   cartItems: CartItem[];
@@ -21,6 +22,9 @@ const Cart: React.FC<CartProps> = ({
   onContinueShopping,
   onCheckout
 }) => {
+  const { siteSettings } = useSiteSettings();
+  const freeDeliveryThreshold = siteSettings?.free_delivery_threshold || 350;
+
   if (cartItems.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
@@ -121,6 +125,19 @@ const Cart: React.FC<CartProps> = ({
       </div>
 
       <div className="bg-white rounded-xl shadow-sm p-4">
+            {/* Free Delivery Banner */}
+            {getTotalPrice() >= freeDeliveryThreshold && (
+              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3 mb-3">
+                <div className="flex items-center space-x-2">
+                  <span className="text-2xl">🎉</span>
+                  <div>
+                    <p className="text-sm font-semibold text-green-900">Free In-House Delivery!</p>
+                    <p className="text-xs text-green-700">Your order qualifies for free delivery.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+        
         <div className="flex items-center justify-between text-xl md:text-2xl font-noto font-semibold text-black mb-3">
           <span>Total:</span>
           <span>₱{(getTotalPrice() || 0).toFixed(2)}</span>

@@ -32,6 +32,7 @@ const AdminDashboard: React.FC = () => {
     category: 'hot-coffee',
     popular: false,
     available: true,
+    sort_order: 0,
     variations: [],
     addOns: []
   });
@@ -46,6 +47,7 @@ const AdminDashboard: React.FC = () => {
       category: defaultCategory,
       popular: false,
       available: true,
+      sort_order: 0,
       variations: [],
       addOns: []
     });
@@ -403,6 +405,20 @@ const AdminDashboard: React.FC = () => {
                   <span className="text-sm font-medium text-black">Available for Order</span>
                 </label>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">Sort Order *</label>
+                <input
+                  type="number"
+                  value={formData.sort_order ?? 0}
+                  onChange={(e) => setFormData({ ...formData, sort_order: Number(e.target.value) })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Lower numbers appear first. Items with the same value are ordered by creation date.
+                </p>
+              </div>
             </div>
 
             {/* Discount Pricing Section */}
@@ -713,6 +729,7 @@ const AdminDashboard: React.FC = () => {
                     <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Name</th>
                     <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Category</th>
                     <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Price</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Sort Order</th>
                     <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Variations</th>
                     <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Add-ons</th>
                     <th className="px-6 py-4 text-left text-sm font-medium text-gray-900">Status</th>
@@ -750,6 +767,11 @@ const AdminDashboard: React.FC = () => {
                             <span>₱{item.basePrice}</span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 rounded-md font-medium">
+                          {item.sort_order ?? 0}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {item.variations?.length || 0} variations
