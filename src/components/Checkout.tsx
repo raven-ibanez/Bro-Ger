@@ -47,6 +47,37 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack }) =>
 
   const selectedPaymentMethod = paymentMethods.find(method => method.id === paymentMethod);
 
+  // Calculate delivery fee
+  const calculateDeliveryFee = () => {
+    // Get the selected service option
+    const selectedService = serviceOptions.find(opt => opt.id === serviceType);
+    const serviceName = selectedService?.name || '';
+
+    // Only apply fee for In-House Delivery
+    const isInHouseDelivery = serviceType === 'in-house-delivery' || serviceName.toLowerCase().includes('in-house');
+
+    const needsDeliveryFee = isInHouseDelivery && totalPrice < freeDeliveryThreshold;
+
+    // Debug logging
+    console.log('=== DELIVERY FEE DEBUG ===');
+    console.log('Service Type ID:', serviceType);
+    console.log('Service Name:', serviceName);
+    console.log('Is In-House Delivery:', isInHouseDelivery);
+    console.log('Total Price:', totalPrice);
+    console.log('Free Delivery Threshold:', freeDeliveryThreshold);
+    console.log('Needs Delivery Fee:', needsDeliveryFee);
+    console.log('========================');
+
+    return needsDeliveryFee ? 40 : 0;
+  };
+
+  const deliveryFee = calculateDeliveryFee();
+  const finalTotal = totalPrice + deliveryFee;
+  
+  // Debug logging for final values
+  console.log('Delivery Fee:', deliveryFee);
+  console.log('Final Total:', finalTotal);
+
   const handleProceedToPayment = () => {
     setStep('payment');
   };
@@ -88,8 +119,8 @@ ${cartItems.map(item => {
   return itemDetails;
 }).join('\n')}
 
-💰 TOTAL: ₱${totalPrice}
-${!isPickup ? `🛵 DELIVERY FEE:` : ''}
+💰 TOTAL: ₱${finalTotal}
+${deliveryFee > 0 ? `🛵 DELIVERY FEE: ₱${deliveryFee}` : ''}
 
 💳 Payment: ${selectedPaymentMethod?.name || paymentMethod}
 📸 Payment Screenshot: Please attach your payment receipt screenshot
@@ -169,9 +200,21 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
             </div>
             
             <div className="border-t border-gray-200 pt-4">
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between text-lg text-gray-700">
+                  <span>Subtotal:</span>
+                  <span>₱{totalPrice}</span>
+                </div>
+                {deliveryFee > 0 && (
+                  <div className="flex items-center justify-between text-lg text-gray-700">
+                    <span>Delivery Fee:</span>
+                    <span>₱{deliveryFee}</span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center justify-between text-2xl font-noto font-semibold text-black">
                 <span>Total:</span>
-                <span>₱{totalPrice}</span>
+                <span>₱{finalTotal}</span>
               </div>
             </div>
           </div>
@@ -209,19 +252,19 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
               {/* Service Type */}
               <div>
                 <label className="block text-sm font-medium text-black mb-3">Service Type *</label>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
                   {serviceOptions.map((option) => (
                     <button
                       key={option.id}
                       type="button"
                       onClick={() => setServiceType(option.id)}
-                      className={`py-5 rounded-xl border-2 transition-all duration-300 flex items-center justify-center w-full ${
+                      className={`py-2 rounded-md border-2 transition-all duration-300 flex items-center justify-center w-full ${
                         serviceType === option.id
                           ? 'border-black bg-black text-white shadow-lg scale-[1.01]'
                           : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50 hover:shadow-md'
                       }`}
                     >
-                      <div className={`text-xl font-semibold ${serviceType === option.id ? 'text-white' : 'text-gray-700'}`}>
+                      <div className={`text-base font-semibold ${serviceType === option.id ? 'text-white' : 'text-gray-700'}`}>
                         {option.name}
                       </div>
                     </button>
@@ -247,6 +290,22 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                     }
                     return null;
                   })()}
+                  
+                  {/* Delivery Fee Notice */}
+                  {deliveryFee > 0 && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                      <div className="flex items-start space-x-2">
+                        <Info className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-sm font-medium text-amber-900 mb-1">Delivery Fee</h4>
+                          <p className="text-sm text-amber-700">
+                            A ₱{deliveryFee} delivery fee will be added to your order. 
+                            Free delivery for orders ₱{freeDeliveryThreshold} and above.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -410,7 +469,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                   <p className="text-sm text-gray-600 mb-1">{selectedPaymentMethod.name}</p>
                   <p className="font-mono text-black font-medium">{selectedPaymentMethod.account_number}</p>
                   <p className="text-sm text-gray-600 mb-3">Account Name: {selectedPaymentMethod.account_name}</p>
-                  <p className="text-xl font-semibold text-black">Amount: ₱{totalPrice}</p>
+                  <p className="text-xl font-semibold text-black">Amount: ₱{finalTotal}</p>
                 </div>
                 <div className="flex-shrink-0">
                   <img 
@@ -498,9 +557,21 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
           </div>
           
           <div className="border-t border-gray-200 pt-4 mb-6">
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center justify-between text-lg text-gray-700">
+                <span>Subtotal:</span>
+                <span>₱{totalPrice}</span>
+              </div>
+              {deliveryFee > 0 && (
+                <div className="flex items-center justify-between text-lg text-gray-700">
+                  <span>Delivery Fee:</span>
+                  <span>₱{deliveryFee}</span>
+                </div>
+              )}
+            </div>
             <div className="flex items-center justify-between text-2xl font-noto font-semibold text-black">
               <span>Total:</span>
-              <span>₱{totalPrice}</span>
+              <span>₱{finalTotal}</span>
             </div>
           </div>
 
