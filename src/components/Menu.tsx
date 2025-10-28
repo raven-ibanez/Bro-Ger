@@ -14,7 +14,7 @@ interface MenuProps {
 }
 
 const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuantity, selectedCategory = 'grilledburger', onCategorySelect }) => {
-  const { categories } = useCategories();
+  const { categories, loading: loadingCategories } = useCategories();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isSearching, setIsSearching] = React.useState(false);
   const [showQuantityModal, setShowQuantityModal] = React.useState(false);
@@ -157,41 +157,26 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
                 </div>
                 <div className="flex space-x-2">
                   <button 
-                    onClick={() => onCategorySelect('home')}
+                    onClick={() => onCategorySelect && onCategorySelect('home')}
                     className={`px-3 py-1 rounded text-sm ${selectedCategory === 'home' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
                   >
                     HOME
                   </button>
-                  <button 
-                    onClick={() => onCategorySelect('grilledburger')}
-                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'grilledburger' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-                  >
-                    GRILLEDBURGER
-                  </button>
-                  <button 
-                    onClick={() => onCategorySelect('chickensandwich')}
-                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'chickensandwich' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-                  >
-                    CHICKENSANDWICH
-                  </button>
-                  <button 
-                    onClick={() => onCategorySelect('pickapicka')}
-                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'pickapicka' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-                  >
-                    PICKA-PICKA
-                  </button>
-                  <button 
-                    onClick={() => onCategorySelect('drinks')}
-                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'drinks' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-                  >
-                    DRINKS
-                  </button>
-                  <button 
-                    onClick={() => onCategorySelect('addons')}
-                    className={`px-3 py-1 rounded text-sm ${selectedCategory === 'addons' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
-                  >
-                    ADD ONS
-                  </button>
+                  {loadingCategories ? (
+                    [1,2,3,4,5].map(i => (
+                      <div key={i} className="w-28 h-8 bg-gray-100 rounded animate-pulse" />
+                    ))
+                  ) : (
+                    categories.map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={() => onCategorySelect && onCategorySelect(cat.id)}
+                        className={`px-3 py-1 rounded text-sm ${selectedCategory === cat.id ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+                      >
+                        {cat.name.toUpperCase()}
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
               

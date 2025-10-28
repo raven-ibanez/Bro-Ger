@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MessageCircle, Facebook, ChevronDown } from 'lucide-react';
 import { useSidebarContent } from '../hooks/useSidebarContent';
+import { useCategories } from '../hooks/useCategories';
 
 interface SidebarProps {
   selectedCategory: string;
@@ -11,14 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
   const [expandedDelivery, setExpandedDelivery] = useState(false);
   const [expandedPickup, setExpandedPickup] = useState(false);
   const { content, loading } = useSidebarContent();
-  
-  const categories = [
-    { id: 'grilledburger', name: 'GRILLEDBURGER', icon: '🍔' },
-    { id: 'chickensandwich', name: 'CHICKENSANDWICH', icon: '🐔' },
-    { id: 'pickapicka', name: 'PICKA-PICKA', icon: '🍗' },
-    { id: 'drinks', name: 'DRINKS', icon: '🥤' },
-    { id: 'addons', name: 'ADD ONS', icon: '➕' }
-  ];
+  const { categories, loading: loadingCategories } = useCategories();
 
   return (
     <div className="hidden lg:block w-full lg:w-80 bg-white border-r border-gray-200 p-4 lg:p-6 space-y-4 lg:space-y-6">
@@ -98,24 +92,32 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedCategory, onCategorySelect })
       {/* Categories Card */}
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h3 className="font-semibold text-black text-lg mb-3">CATEGORIES</h3>
-        <div className="space-y-2">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => onCategorySelect(category.id)}
-              className={`w-full text-left text-sm transition-colors ${
-                selectedCategory === category.id
-                  ? 'bg-black text-white px-3 py-2 rounded'
-                  : 'text-gray-600 hover:text-black'
-              }`}
-            >
-              <span className="inline-flex items-center space-x-2">
-                <span>{category.icon}</span>
-                <span>{category.name}</span>
-              </span>
-            </button>
-          ))}
-        </div>
+        {loadingCategories ? (
+          <div className="space-y-2">
+            {[1,2,3,4].map(i => (
+              <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => onCategorySelect(category.id)}
+                className={`w-full text-left text-sm transition-colors ${
+                  selectedCategory === category.id
+                    ? 'bg-black text-white px-3 py-2 rounded'
+                    : 'text-gray-600 hover:text-black'
+                }`}
+              >
+                <span className="inline-flex items-center space-x-2">
+                  <span>{category.icon}</span>
+                  <span>{category.name}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
