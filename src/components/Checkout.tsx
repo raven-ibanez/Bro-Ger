@@ -579,7 +579,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
             onClick={handlePlaceOrder}
             className="w-full py-4 rounded-xl font-medium text-lg transition-all duration-200 transform bg-black text-white hover:bg-gray-800 hover:scale-[1.02]"
           >
-            Place Order via Messenger
+            Click here to place your order
           </button>
           
           <p className="text-xs text-gray-500 text-center mt-3">
