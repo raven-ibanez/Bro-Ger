@@ -173,7 +173,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                   <span className="text-2xl">🎉</span>
                   <div>
                     <p className="text-sm font-semibold text-green-900">Free In-House Delivery!</p>
-                    <p className="text-xs text-green-700">Your order qualifies for free delivery.</p>
+                    <p className="text-xs text-green-700">Your order qualifies for free delivery for IN-HOUSE DELIVERY.</p>
                   </div>
                 </div>
               </div>
@@ -508,7 +508,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                 <span className="text-2xl">🎉</span>
                 <div>
                   <p className="text-sm font-semibold text-green-900">Free In-House Delivery!</p>
-                  <p className="text-xs text-green-700">Your order qualifies for free delivery.</p>
+                  <p className="text-xs text-green-700">Your order qualifies for free delivery for IN-HOUSE DELIVERY.</p>
                 </div>
               </div>
             </div>
