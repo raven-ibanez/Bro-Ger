@@ -373,7 +373,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">Landmark</label>
+                    <label className="block text-sm font-medium text-black mb-2">Landmark (Optional)</label>
                     <input
                       type="text"
                       value={landmark}

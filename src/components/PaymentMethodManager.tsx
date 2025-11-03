@@ -64,8 +64,8 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
   };
 
   const handleSaveMethod = async () => {
-    if (!formData.id || !formData.name || !formData.account_number || !formData.account_name || !formData.qr_code_url) {
-      alert('Please fill in all required fields');
+    if (!formData.id || !formData.name || !formData.qr_code_url) {
+      alert('Please fill in all required fields (Name, ID, and QR Code)');
       return;
     }
 
@@ -183,7 +183,7 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Account Number/Phone *</label>
+                <label className="block text-sm font-medium text-black mb-2">Account Number/Phone (Optional)</label>
                 <input
                   type="text"
                   value={formData.account_number}
@@ -194,7 +194,7 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Account Name *</label>
+                <label className="block text-sm font-medium text-black mb-2">Account Name (Optional)</label>
                 <input
                   type="text"
                   value={formData.account_name}
