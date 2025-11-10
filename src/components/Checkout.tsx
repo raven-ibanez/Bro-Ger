@@ -167,7 +167,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
             <h2 className="text-xl font-noto font-medium text-black mb-4">Order Summary</h2>
             
             {/* Free Delivery Banner */}
-            {totalPrice >= freeDeliveryThreshold && (
+            {totalPrice >= freeDeliveryThreshold && serviceOptions.find(opt => opt.id === 'in-house-delivery' || opt.name.toLowerCase().includes('in-house'))?.active && (
               <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3 mb-4">
                 <div className="flex items-center space-x-2">
                   <span className="text-2xl">🎉</span>
@@ -502,7 +502,7 @@ Please confirm this order to proceed. Thank you for choosing Bro-Ger! 🥟
           <h2 className="text-2xl font-noto font-medium text-black mb-6">Final Order Summary</h2>
           
           {/* Free Delivery Banner */}
-          {totalPrice >= freeDeliveryThreshold && (
+          {totalPrice >= freeDeliveryThreshold && serviceOptions.find(opt => opt.id === 'in-house-delivery' || opt.name.toLowerCase().includes('in-house'))?.active && (
             <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3 mb-4">
               <div className="flex items-center space-x-2">
                 <span className="text-2xl">🎉</span>
