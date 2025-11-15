@@ -2,6 +2,7 @@ import React from 'react';
 import { Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
 import { CartItem } from '../types';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import { useServiceOptions } from '../hooks/useServiceOptions';
 
 interface CartProps {
   cartItems: CartItem[];
@@ -23,6 +24,7 @@ const Cart: React.FC<CartProps> = ({
   onCheckout
 }) => {
   const { siteSettings } = useSiteSettings();
+  const { serviceOptions } = useServiceOptions();
   const freeDeliveryThreshold = siteSettings?.free_delivery_threshold || 350;
 
   if (cartItems.length === 0) {
@@ -126,7 +128,7 @@ const Cart: React.FC<CartProps> = ({
 
       <div className="bg-white rounded-xl shadow-sm p-4">
             {/* Free Delivery Banner */}
-            {getTotalPrice() >= freeDeliveryThreshold && (
+            {getTotalPrice() >= freeDeliveryThreshold && serviceOptions.find(opt => opt.id === 'in-house-delivery' || opt.name.toLowerCase().includes('in-house'))?.active && (
               <div className="bg-green-50 border-2 border-green-300 rounded-lg p-3 mb-3">
                 <div className="flex items-center space-x-2">
                   <span className="text-2xl">🎉</span>
